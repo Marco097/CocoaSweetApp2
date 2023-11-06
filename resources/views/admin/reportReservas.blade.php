@@ -1,14 +1,14 @@
 @extends('adminlte::page')
 
-@section('title', 'Rentas')
+@section('title', 'Reporte Reservas')
 
 @section('content_header')
-    <h1>GESTION DE PEDIDOS</h1>
+    <h1>Reportes</h1>
 @stop
 
 @section('content')
     <div id = "app">
-      <pedidos-list></pedidos-list>
+        <reservas-report></reservas-report>
     </div>
 @stop
 

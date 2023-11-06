@@ -24,7 +24,7 @@
             </div>
         @endif
         @if(count($errors) > 0)
-            @foreach($errors0>all() as $error)
+        @foreach($errors->all() as $error)
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ $error }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -52,7 +52,7 @@
                 <b><a href="/shop/{{ $item->attributes->slug }}">{{ $item->name }}</a></b><br>
                 <b>Precio: ${{ $item->price }}</b><br>
                 <b>Cantidad: {{ $item->quantity }}</b><br>
-                @if ($item->attributes->cobertura)
+               {{--   @if ($item->attributes->cobertura)
                     @php
                         $cobertura = $coberturas->firstWhere('id', $item->attributes->cobertura);
                         $precioCobertura = $cobertura ? $cobertura->precio : 0;
@@ -62,7 +62,7 @@
                     <b>Total del Producto: ${{ $totalProducto }}</b><br>
                 @else
                     <b>Total del Producto: ${{ $item->price * $item->quantity }}</b><br>
-                @endif
+                @endif--}}
             </p>
         </div>
         <div class="col-lg-4">
@@ -74,16 +74,15 @@
                     <input type="number" name="quantity" id="quantity" value="{{ $item->quantity }}">
                             
                     @if ($item->producto && $item->producto->catalogo->nombre == 'Paletas')
-    <label for="cobertura">Cobertura:</label>
+    {{--  <label for="cobertura">Cobertura:</label>
     <select name="cobertura" id="cobertura">
         @foreach($coberturas as $cobertura)
             <option value="{{ $cobertura->id }}" {{ $item->attributes->cobertura == $cobertura->id ? 'selected' : '' }}>{{ $cobertura->nombre }}</option>
         @endforeach
-    </select>
+    </select>--}}
 @endif
 
-                    <label for="personalizacion">Personalización:</label>
-                    <input type="text" name="personalizacion" id="personalizacion">
+                    
                     <button type="submit" class="btn btn-primary"  style="margin-right: 10px;">Actualizar</button>
                     <form action="{{ route('cart.remove') }}" method="POST">
                         {{ csrf_field() }}
@@ -91,7 +90,7 @@
                         <button class="btn btn-dark btn-sm" style="margin-right: 10px;"><i class="fa fa-trash"></i></button>
                     </form>
                 </form>
-                <!-- Aquí va tu código para eliminar el producto del carrito -->
+                <!-- Aquí va código para eliminar el producto del carrito -->
                 
             </div>
         </div>
@@ -121,43 +120,31 @@
                         </ul>
                     </div>
                     <br><a href="/shop" class="btn btn-dark">Continue en la tienda</a>
-                    <a href="/checkout" class="btn btn-success">Proceder a metodo de pago</a>
+                    <a href="/checkout" class="btn btn-success">Realizar Pedido</a>
                               <!-- Button trigger modal -->
         
-            <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#datoModal">
-                Direccion
-            </button>
+                              <form action="{{ route('pedido.finalizar') }}" method="POST">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="direccion_envio">Dirección de envío:</label>
+                                    <input type="text" id="direccion_envio" name="direccion_envio" class="form-control" value="{{ auth()->user()->direccion }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="telefono">Teléfono:</label>
+                                    <input type="text" id="telefono" name="telefono" class="form-control" value="{{ auth()->user()->telefono }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fecha_entrega">Fecha de entrega:</label>
+                                    <input type="date" id="fecha_entrega" name="fecha_entrega" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-success">Realizar Pedido</button>
+                            </form>
+                            
        
                 </div>
             @endif
 
-  <!-- Modal -->
-  <div class="modal fade" id="datoModal" tabindex="-1" aria-labelledby="datoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="datoModalLabel">Llene los siguientes datos para la entrega</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="datosEntregaForm">
-                    <div class="mb-3">
-                        <label for="direccion" class="form-label">Dirección</label>
-                        <input type="text" class="form-control" id="direccion" name="direccion">
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Telefono</label>
-                        <input type="text" class="form-control" id="telefono" name="telefono">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarDatosEntrega()">Guardar cambios</button>
-            </div>
-        </div>
-    </div>
-</div>
+  
 
         <br><br>
 

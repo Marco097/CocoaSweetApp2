@@ -21,13 +21,21 @@
                                      alt="{{ $pro->image_path }}"
                                 >
                                 <div class="card-body" >
-                                    <a href=""><h6 class="card-title">{{ $pro->nombre }}</h6></a>
+                                    <p href=""><h6 class="card-title">{{ $pro->nombre }}</h6>
+                                        <ul>
+                                            @foreach ($pro->sabores as $sabor)
+                                                <li>{{ $sabor->nombre }}</li>
+                                            @endforeach
+                                            </ul></p>
+                                    
                                     <p>${{ $pro->precio }}</p>
+                                    
                                     <form action="{{ route('cart.store') }}" method="POST">
                                         {{ csrf_field() }}
                                         <input type="hidden" value="{{ $pro->id }}" id="id" name="id">
                                         <input type="hidden" value="{{ $pro->nombre }}" id="name" name="name">
                                         <input type="hidden" value="{{ $pro->precio }}" id="price" name="price">
+                                        
                                         <input type="hidden" value="{{ $pro->image }}" id="img" name="img">
                                         <input type="hidden" value="{{ $pro->slug }}" id="slug" name="slug">
                                         <div class="form-group">

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('detalle_pedidos', function (Blueprint $table) {
             $table->id();
             $table->integer('cantidad')->nullable();
-            $table->decimal('precio_unitario', 5,2);  
+            $table->decimal('precio_unitario', 5,2)->nullable();  
             $table->decimal('descuento_obtenido', 5,2)->nullable(); 
             $table->unsignedBigInteger('producto_id'); 
             $table->foreign('producto_id')->references('id')->on('productos');
