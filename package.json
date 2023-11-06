@@ -19,8 +19,6 @@
         "composer": "^4.1.0",
         "font-awesome": "^4.7.0",
         "vue-axios": "^3.5.2",
-        "vue-sweetalert2": "^5.0.5",
-        "@fortawesome/fontawesome": "^4.7.0",
-        "@fortawesome/fontawesome-free-solid": "^5.0.13"
+        "vue-sweetalert2": "^5.0.5"
     }
 }

@@ -9,12 +9,8 @@
         </nav>
         <div class="row justify-content-center">
             <div class="col-lg-12">
-                <div class="row">
-                    <div class="col-lg-7">
-                        <h4>Productos</h4>
-                    </div>
-                </div>
-                <hr>
+                <h4 class="text-center" style="color: #FFB6C1;">Productos</h4>
+                <hr> 
                 <div class="row">
                     @foreach($products as $pro)
                         <div class="col-md">
