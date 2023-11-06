@@ -111,4 +111,11 @@ class BancoController extends Controller
                     return $e->getMessage();
                  }
     }
+
+    //No borrar
+    public function obtenerBancos()
+{
+    $bancos = Banco::all();
+    return $bancos;
+}
 }

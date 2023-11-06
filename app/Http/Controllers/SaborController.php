@@ -113,4 +113,11 @@ class SaborController extends Controller
                     return $e->getMessage();
                  }
     }
+
+    //No borrar
+    public function obtenerSabores()
+    { 
+    $sabores = Sabor::all();
+    return $sabores;
+    }
 }

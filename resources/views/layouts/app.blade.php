@@ -71,6 +71,11 @@
                             </a>
                             <!-- Apartado de nombre para irse para el login -->
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+
+                                @can('admin.dash')
+                                <a class="dropdown-item" href="{{route('admin.dash')}}">Dashboard</a>
+                               @endcan
+
                                 <a class="dropdown-item" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
                                    document.getElementById('logout-form').submit();">

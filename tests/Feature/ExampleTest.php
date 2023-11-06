@@ -4,16 +4,24 @@ namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Mail\ExampleEmail;
+use Illuminate\Support\Facades\Mail;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
+    public function testExampleEmail()
     {
-        $response = $this->get('/');
+        Mail::fake();
 
-        $response->assertStatus(200);
+        $recipient = 'marco@gmail.com';
+        $subject = 'Gracias';
+
+        // Supongamos que estás enviando un correo con ExampleEmail
+        Mail::to($recipient)->send(new ExampleEmail());
+
+        // Verifica que se haya enviado el correo a la dirección especificada
+        Mail::assertSent(ExampleEmail::class, function ($mail) use ($recipient, $subject) {
+            return $mail->hasTo($recipient) && $mail->subject($subject);
+        });
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\CatalogoController;
 use App\Http\Controllers\CoberturaController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\Admin\UserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,16 +37,19 @@ Route::get('productos', function () {
 Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
-Route::get('/admin', [HomeController::class,'dash'])->name('admin.dash');//->middleware('auth.admin');
-Route::resource('sabores', SaborController::class); //->middleware('auth.admin');
+Route::get('/admin', [HomeController::class,'dash'])->middleware('can:admin.dash')->name('admin.dash');
+Route::resource('sabores', SaborController::class)->middleware('can:admin.dash')->names('admin.sabores');
+Route::resource('users', UserController::class)->only(['index', 'edit', 'update'])->middleware('can:admin.dash')->names('admin.users');
 
- Route::resource('productos', ProductoController::class); //->middleware('auth.admin');
+ Route::resource('productos', ProductoController::class)->middleware('can:admin.dash')->names('admin.productos');
 
-Route::resource('rellenos', RellenoController::class); //->middleware('auth.admin');
-Route::resource('pedidos', PedidoController::class);
-Route::resource('catalogos', CatalogoController::class); //->middleware('auth.admin');
-Route::resource('coberturas', CoberturaController::class);
-Route::resource('bancos', BancoController::class);
+ Route::post('/productos/{producto}', [ProductoController::class, 'update']);
+
+Route::resource('rellenos', RellenoController::class)->middleware('can:admin.dash')->names('admin.rellenos');
+Route::resource('pedidos', PedidoController::class)->middleware('can:admin.dash')->names('admin.pedidos');
+Route::resource('catalogos', CatalogoController::class)->middleware('can:admin.dash')->names('admin.categorias');
+Route::resource('coberturas', CoberturaController::class)->middleware('can:admin.dash')->names('admin.cobertura');
+Route::resource('bancos', BancoController::class)->middleware('can:admin.dash')->names('admin.bancos');
 
 //Route::put('pedidos/change',[PedidoController::class,'changeState']);
 //Route::resource('rellenos', RellenoController::class);

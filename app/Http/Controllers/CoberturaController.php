@@ -117,4 +117,11 @@ class CoberturaController extends Controller
                     return $e->getMessage();
                  }
     }
+
+    //No borrar
+    public function obtenerCoberturas()
+    {
+    $coberturas = Cobertura::all();
+    return $coberturas;
+    }
 }

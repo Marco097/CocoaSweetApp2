@@ -372,6 +372,11 @@ return [
             'icon_color'        => 'primary',
             'icon' => 'fas fw fa-home',
         ],
+        [
+            'text'        => 'Usuarios',
+            'route'         => 'admin.users.index',
+            'icon' => 'fas fw fa-users',
+        ],
     ],
 
     /*

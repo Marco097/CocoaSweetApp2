@@ -15,7 +15,7 @@ class CartController extends Controller
     public function shop()
     {
         $products = Producto::all();
-        $sabore = Sabor::all();
+        //$sabore = Sabor::all();
        //dd($products);
         return view('shop')->with(['products' => $products]);
     }
@@ -36,24 +36,20 @@ class CartController extends Controller
     }
 
     public function add(Request $request){
+        //$id = $request->input('id');
         $quantity = $request->input('quantity');
         $cobertura = $request-> input('cobertura');
+        //$personalizacion = $request->input('personalizacion');
         //$cobertura->precio = $request->input('precio'); 
-
+        $product = Producto::find($request->id);
         Cart::add([
             'id' => $request->id,
             'name' => $request->name,
             'price' => $request->price,
             'quantity' => $quantity,
             'attributes' => [
-                'image' => $request->img,
+                'img' => $product->imagen,
                 'slug' => $request->slug,
-                'cobertura' => $cobertura,
-            ],
-        ]);
-        
-        Cart::update($request->id, [
-            'attributes' => [
                 'cobertura' => $cobertura,
             ],
         ]);
@@ -73,7 +69,7 @@ class CartController extends Controller
 
     // Verifica si el elemento ya existe en el carrito
     if ($cartItem) {
-        // Actualiza la cantidad
+        // Actualiza la cantidad y los atributos
         \Cart::update($id, array(
             'quantity' => array(
                 'relative' => false,

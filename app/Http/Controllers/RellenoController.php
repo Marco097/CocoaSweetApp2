@@ -113,4 +113,11 @@ class RellenoController extends Controller
                     return $e->getMessage();
                  }
     }
+
+    //No borrar :)
+    public function obtenerRellenos()
+{
+    $rellenos = Relleno::all();
+    return $rellenos;
+}
 }
