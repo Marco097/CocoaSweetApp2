@@ -23,6 +23,10 @@ class Producto extends Model
            {
                return $this->hasMany(ProductoSabor::class);
            }
+           public function sabores()
+{
+    return $this->belongsToMany('App\Models\Sabor', 'producto_sabores');
+}
    
                //relacion de 1:N con 
    

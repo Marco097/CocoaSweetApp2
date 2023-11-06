@@ -16,7 +16,7 @@
                         <a class="navbar-brand" style="color:#FFFFFF" href="{{url('/productos')}}">Inicio</a>
                     </li>
                     <li class="nav-item text-center">
-                      <a class="navbar-brand" style="color: #FFFFFF; font-size: 19px;" href="{{ url('/productos') }}">productos</a>
+                      <a class="navbar-brand" style="color: #FFFFFF; font-size: 19px;" href="{{ url('/shop') }}">productos</a>
                   </li>
                   
       

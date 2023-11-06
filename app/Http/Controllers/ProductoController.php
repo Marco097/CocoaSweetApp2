@@ -20,7 +20,7 @@ class ProductoController extends Controller
         //
         try {
             // Obtener todos los productos con sus relaciones
-            $productos = Producto::with(['producto_sabores', 'relleno', 'catalogo', 'producto_promociones', 'producto_coberturas'])->get();
+            $productos = Producto::with(['producto_sabores', 'relleno', 'catalogo', 'producto_coberturas'])->get();
             
             // Iterar sobre los productos y cargar los sabores en un array
             $response = $productos->map(function ($producto) {
@@ -102,7 +102,7 @@ class ProductoController extends Controller
                 }
             }
             //guardando la relcion de promociones 
-            $promocio = $request->productoPromocion;
+           /* $promocio = $request->productoPromocion;
            if (!is_null($promocio) && is_array($promocio)) 
             {
                 foreach ($promocio as $key => $promo) {
@@ -114,7 +114,7 @@ class ProductoController extends Controller
                         $errores++;
                     }
                 }
-            }
+            }*/
             //GUARDANDO LA COBERTURA
             
             $cobertu = $request->productoCobertura;
@@ -159,7 +159,7 @@ class ProductoController extends Controller
             $response["relleno"]= $producto->relleno->toArray();
             $response["catalogo"]= $producto->catalogo->toArray();
             $response["sabor"] = $producto->sabor->toArray();
-            $response["promocion"] = $producto->promocion->toArray();  
+           // $response["promocion"] = $producto->promocion->toArray();  
             $response["cobertura"] = $producto->cobertura->toArray(); 
           // Calcula el costo total, incluyendo las coberturas adicionales
         $costoTotal = $producto->precio;

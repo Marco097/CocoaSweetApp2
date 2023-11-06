@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('direccion_envio', 200);
             $table->string('telefono',9);
             $table->decimal('total', 5,2);
-            $table->decimal('costo_envio', 5,2);
+            $table->decimal('costo_envio', 5,2)->default(2.00)->nullable();
             $table->date('fecha_entrega');
             $table->string('estado',1)->default('P');
             $table->unsignedBigInteger('user_id');

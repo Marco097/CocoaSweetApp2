@@ -14,22 +14,20 @@ class CartController extends Controller
 {
     public function shop()
     {
-        $products = Producto::all();
-        //$sabore = Sabor::all();
-       //dd($products);
-        return view('shop')->with(['products' => $products]);
+        $products = Producto::with('sabores')->get();
+    return view('shop')->with(['products' => $products]);
     }
     public function cart()  {
-        $cartCollection = Cart::getContent();
+        $cartCollection = \Cart::getContent();
         $coberturas = Cobertura::all();
     
         return view('cart', compact('cartCollection', 'coberturas'));
     }
     public function remove(Request $request){
-        Cart::remove($request->id);
+        \Cart::remove($request->id);
 
         // Obtén los datos actualizados del carrito y devuélvelos como JSON
-        $cartCollection = Cart::getContent();
+        $cartCollection = \Cart::getContent();
     
         return redirect()->route('cart.index')->with('success_msg', 'El producto fue eliminado');
         //return response()->json(['message' => 'Item is removed!', 'cart' => $cartCollection]);
@@ -42,7 +40,7 @@ class CartController extends Controller
         //$personalizacion = $request->input('personalizacion');
         //$cobertura->precio = $request->input('precio'); 
         $product = Producto::find($request->id);
-        Cart::add([
+        \Cart::add([
             'id' => $request->id,
             'name' => $request->name,
             'price' => $request->price,
@@ -50,7 +48,7 @@ class CartController extends Controller
             'attributes' => [
                 'img' => $product->imagen,
                 'slug' => $request->slug,
-                'cobertura' => $cobertura,
+                //'cobertura' => $cobertura,
             ],
         ]);
 
@@ -77,7 +75,7 @@ class CartController extends Controller
             ),
             'attributes' => array(
                 'cobertura' => $cobertura,
-                'personalizacion' => $personalizacion,
+               // 'personalizacion' => $personalizacion,
             ),
         ));
     }

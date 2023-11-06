@@ -46,24 +46,16 @@ Route::resource('users', UserController::class)->only(['index', 'edit', 'update'
  Route::post('/productos/{producto}', [ProductoController::class, 'update']);
 
 Route::resource('rellenos', RellenoController::class)->middleware('can:admin.dash')->names('admin.rellenos');
-Route::resource('pedidos', PedidoController::class)->middleware('can:admin.dash')->names('admin.pedidos');
+//Route::resource('pedidos', PedidoController::class)->middleware('can:admin.dash')->names('admin.pedidos');
 Route::resource('catalogos', CatalogoController::class)->middleware('can:admin.dash')->names('admin.categorias');
 Route::resource('coberturas', CoberturaController::class)->middleware('can:admin.dash')->names('admin.cobertura');
 Route::resource('bancos', BancoController::class)->middleware('can:admin.dash')->names('admin.bancos');
 
-//Route::put('pedidos/change',[PedidoController::class,'changeState']);
-//Route::resource('rellenos', RellenoController::class);
 Route::get('/productos-reservas', [ProductoController::class, 'index']);
-//Route::get('/productos-cart', [ProductoController::class, 'index']);
-//Route::get('/', [CartController::class, 'shop'])->name('shop');
-//Route::get('/cart', [CartController::class, 'cart'])->name('cart.index');
 
 
 
-//Route::post('/cart-add', [CartController::class])->name('cart.add');
-//Route::get('/cart-checkout',[CartController::class])->name('cart.checkout');
-//Route::post('/cart-clear', [CartController::class])->name('cart.clear');
-//Route::post('/cart-removeitem', CartController::class);
+
 Route::resource('cart', CartController::class);
 Route::get('/shop', [CartController::class, 'shop']);
 Route::get('/cart', [CartController::class, 'cart'])->name('cart.index');
@@ -72,9 +64,17 @@ Route::post('/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/clear', [CartController::class, 'clear'])->name('cart.clear');
 
-//Route::post('/cart-add', [CartController::class])->name('cart.add');
-//Route::get('/cart-checkout',[CartController::class])->name('cart.checkout');
-//Route::post('/cart-clear', [CartController::class])->name('cart.clear');
-//Route::post('/cart-removeitem', [CartController::class])->name('cart.removeitem');
+
+Route::post('/finalizar', [PedidoController::class, 'finalizar'])->name('pedido.finalizar');
 
 
+Route::resource('pedidos', PedidoController::class);
+Route::put('pedido/change', [PedidoController::class, 'changeState']);
+Route::get('pedidos/state', [PedidoController::class, 'showByState']);
+
+Route::get('/reportes/productos/pdf',[PDFController::class,'pdfProductos'])->name('pdfProductos');
+Route::get('/reportes/reservas/rango',[PDFController::class,'pdfReservas'])->name('pdfReservas');
+
+Route::get('/reportes/reservas',[PDFController::class,'viewReservas'])->name('report.reservas');
+
+//Route::get('/alquileres/{estado}', [PedidoController::class, 'showBystate']);

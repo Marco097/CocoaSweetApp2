@@ -313,7 +313,7 @@ return [
         ],
         [
             'text'        => 'Inicio',
-            'url'         => '/home',
+            'url'         => '/shop',
             'icon_color'        => 'primary',
             'icon' => 'fas fw fa-home',
         ],
@@ -344,8 +344,8 @@ return [
         [
             'text'        => 'Productos',
             'route'  => 'productos.create',
-            'icon_color'        => 'primary',
-            'icon' => 'fas fw fa-home',
+            'icon_color'        => 'segundary',
+            'icon' => 'fas fw fa-ice-cream',
         ],
         [
             'text'    => 'Reportes',
@@ -353,8 +353,12 @@ return [
             'icon_color'=> 'primary',
             'submenu' => [
                 [
-                    'text' => 'Pedidos',
-                    'url'  => '#',
+                    
+                        'text'        => 'Gestion de Pedidos',
+                        'route'         => 'pedidos.create',
+                        'icon'        => 'primary',
+                        'icon' => 'fas fw fa-truck',
+                   
                 ],
                 [
                     'text' => 'Coberturas',
