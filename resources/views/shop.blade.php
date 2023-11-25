@@ -11,6 +11,12 @@
             <div class="col-lg-12">
                 <h4 class="text-center" style="color: #FFB6C1;">Productos</h4>
                 <hr> 
+                <form action="{{ route('search.products') }}" method="GET" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Buscar productos">
+                    <button type="submit" class="btn btn-outline-dark">Buscar</button>
+                </div>
+            </form>
                 <div class="row">
                     @foreach($products as $pro)
                         <div class="col-md">
@@ -53,9 +59,12 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                  @endforeach
                 </div>
             </div>
         </div>
     </div>
+
 @endsection
+
+

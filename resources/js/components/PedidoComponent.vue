@@ -175,7 +175,7 @@
                 estado: null,
                 },
              
-            }, 300);
+        }, 300);
             $('#pedidoModal').modal('hide');
         },
         

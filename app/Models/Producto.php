@@ -19,17 +19,16 @@ class Producto extends Model
                 return $this->belongsTo(Relleno::class);
             }
            //relacion de 1:N con producto sabor
+           
            public function producto_sabores()
            {
                return $this->hasMany(ProductoSabor::class);
            }
+           
            public function sabores()
-{
-    return $this->belongsToMany('App\Models\Sabor', 'producto_sabores');
-}
-   
-               //relacion de 1:N con 
-   
+           {
+               return $this->belongsToMany('App\Models\Sabor', 'producto_sabores');
+           }
            public function detalle_pedidos()
            {
                return $this->hasMany(DetallePedido::class);

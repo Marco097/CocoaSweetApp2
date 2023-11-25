@@ -8,29 +8,35 @@ use Cart;
 use Darryldecode\Cart\Cart as CartCart;
 
 use App\Models\Cobertura;
-use App\Models\Sabor;
+
 
 class CartController extends Controller
 {
     public function shop()
     {
-        $products = Producto::with('sabores')->get();
-    return view('shop')->with(['products' => $products]);
+        try {
+            $products = Producto::with('sabores')->where('estado', 'activo')->get();
+    
+            return view('shop')->with(['products' => $products]);
+        } catch (\Exception $e) {
+            // Manejar cualquier excepción si es necesario
+            return response()->json(['status' => 'fail', 'data' => null], 500);
+        }
+    }
+
+    public function searchProducts(Request $request){
+        $query = $request->input('search');
+        $products = Producto::where('estado', 'activo')
+            ->where('nombre', 'like', "%$query%")
+            ->get();
+    
+        return view('shop', compact('products', 'query'));
     }
     public function cart()  {
         $cartCollection = \Cart::getContent();
         $coberturas = Cobertura::all();
     
         return view('cart', compact('cartCollection', 'coberturas'));
-    }
-    public function remove(Request $request){
-        \Cart::remove($request->id);
-
-        // Obtén los datos actualizados del carrito y devuélvelos como JSON
-        $cartCollection = \Cart::getContent();
-    
-        return redirect()->route('cart.index')->with('success_msg', 'El producto fue eliminado');
-        //return response()->json(['message' => 'Item is removed!', 'cart' => $cartCollection]);
     }
 
     public function add(Request $request){
@@ -57,13 +63,17 @@ class CartController extends Controller
 
     public function update(Request $request)
 {
+    
     $id = $request->input('id');
     $quantity = $request->input('quantity');
     $cobertura = $request->input('cobertura');
     $personalizacion = $request->input('personalizacion');
 
+    
     // Encuentra el elemento en el carrito por su ID
     $cartItem = \Cart::get($id);
+
+    
 
     // Verifica si el elemento ya existe en el carrito
     if ($cartItem) {
@@ -73,20 +83,24 @@ class CartController extends Controller
                 'relative' => false,
                 'value' => $quantity,
             ),
-            'attributes' => array(
-                'cobertura' => $cobertura,
-               // 'personalizacion' => $personalizacion,
-            ),
         ));
     }
 
     // Redirige de regreso a la página del carrito
-    return redirect()->route('cart.index');
+    return redirect()->route('cart.index')->with('success_msg', 'Su carrito a sido actualizado');
 }
-
 
     public function clear(){
         Cart::clear();
-        return redirect()->route('cart.index')->with('success_msg', 'su Carrito a sido eliminado');
+        return redirect()->route('cart.index')->with('success_msg', 'Su carrito a sido eliminado');
     }
+    
+    public function delete($id){
+    // Lógica para eliminar el producto del carrito
+    \Cart::remove($id);
+
+    // Puedes redirigir a la página del carrito o a donde desees
+    return redirect()->route('cart.index')->with('success_msg', 'El producto fue eliminado');
+  }
+
 }

@@ -22,29 +22,10 @@
                         <a class="navbar-brand" style="color: #FFFFFF; font-size: 19px;" href="#acerca-de" >Acerca de</a>
                     </li>
                     <li class="nav-item text-center">
-                      <a class="navbar-brand" style="color: #FFFFFF; font-size: 19px;" href="#acerca-de" >Contacto</a>
-                  </li>
-                    <li class="nav-item dropdown  nav-item text-center">
-                      <a class="nav-link dropdown-toggle" style="color:#FFFFFF"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          promociones
-                      </a>
-                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Paletas</a>
-                          <a class="dropdown-item" href="#">Ice roll</a>
-                      </div>
+                      <a class="navbar-brand" style="color: #FFFFFF; font-size: 19px;" href="#contactanos" >Contacto</a>
                   </li>
                 </ul>
-                <form class="d-flex ml-auto" role="search">
-                  <input class="form-control me-2"  list="datalistOptions" id="exampleDataList" placeholder="Buscar un producto" aria-label="Search">&nbsp;
-                  <button class="btn btn-outline-primary custom-search-button" style="background-color: #FF27D2; border-color: #FF27D2;">Buscar</button>
-                  <datalist id="datalistOptions">
-                      <option value="Ice roll">
-                      <option value="Paleta">
-                      <option value="Frozen">
-                      <option value="Los Angeles">
-                      <option value="Chicago">
-                  </datalist>
-              </form>
+               
                             
                 <a class="navbar-toggler d-md-none position-absolute top-0 end-0" data-bs-toggle="collapse" href="#navbarSupportedContent" role="button" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="fas fa-times"></i>
@@ -107,7 +88,7 @@
                   <br>
                   <br>
                   <!--apartado del pie de la pagina -->
-                  <footer style="background-color:#cb98d4; padding: 20px; margin-top: 100px;">
+                  <footer id="contactanos" style="background-color:#cb98d4; padding: 20px; margin-top: 100px;">
                     <div class="container" >
                       <div class="row" style=" font-family: Arial, sans-serif;">
                         <div class="col-md-4">
@@ -135,9 +116,5 @@
 
                       </div>
                     </div>                 
-                  </footer> 
-                   <br>
-                    <br>
-                    <br>
-                    <br>     
+                  </footer>   
 @endsection

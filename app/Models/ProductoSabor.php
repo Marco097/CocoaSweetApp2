@@ -12,13 +12,13 @@ class ProductoSabor extends Model
     protected $table = "producto_sabores";
 
         //relaciones inversas
-    public function sabor()
-            {
-                return $this->belongsTo(Sabor::class);
-            }
+        public function sabor()
+        {
+            return $this->belongsTo(Sabor::class, 'sabor_id');
+        }
             
       //relaciones inversas
-    public function producto()
+             public function producto()
             {
               return $this->belongsTo(Producto::class);
             }

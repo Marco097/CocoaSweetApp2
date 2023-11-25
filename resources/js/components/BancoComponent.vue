@@ -8,26 +8,24 @@
                         <div class="col-7">
                         <h5>Banco</h5>
                       </div>
+                       <div class="input-group rounded col-md-4 col-sm-12">
+                          <input type="search" v-model="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+                        </div>
                        <div class="col 6">
                         <button @click="showDialog" class="btn btn-success btn-sm float-end">Nuevo</button>
                        </div>
                     </div>
-                    <div class="row">
-                      <div class="input-group rounded">
-                        <input type="search" v-model="search" @input="buscar" class="form-control rounded" placeholder="Buscar" arial-label="Search" aria-describedby="search-addon">
-                      </div>
-                    </div>
-                  
-                      </div>
+                  </div>
                     <div class="card-body">
                       <table class="table bordered">
                         <thead>
                           <tr>
                             <th scope="col">Banco</th>
+                            <th scope="col">Acciones</th>
                           </tr>
                         </thead>
                             <tbody>
-                              <tr v-for="item in bancos" :key = "item.id" >
+                              <tr v-for="item in items" :key = "item.id" >
                                   <td>{{ item.nombre }}</td>
                                 <td>
                                   <button class="btn btn-primary btn-sm" @click="showDialogEditar(item)">Editar</button>
@@ -82,12 +80,8 @@
                   bancoErrors:{
                     nombre:false
                   },
-                  filters:[],
-                  search: ''
-              }
-          },
-          created: function(){
-            this.filters = this.bancos;
+                  search:''
+              };
           },
           computed:{
         formTitle(){
@@ -96,12 +90,11 @@
           btnTitle(){
           return this.banco.id == null ? "Guardar" : "Actualizar";
           },
-        items()
-          {
-            return this.bancos.filter(item =>{
-              return item.nombre.toLowerCase().includes(this.seach.toLocaleLowerCase());
-            } )
-          }
+          items(){
+                return this.bancos.filter(item =>{
+                    return item.nombre.toLowerCase().includes(this.search.toLowerCase());
+                })
+            }
         },
           methods:{
                //para que no haga una peticion directa 

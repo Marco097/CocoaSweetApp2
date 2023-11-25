@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('precio', 4,2);
             $table->date('hecho');
             $table->date('vencimiento');
+            $table->string('estado')->default('activo');
             $table->string('imagen', 100);
             $table->unsignedBigInteger('relleno_id')->nullable();
             $table->foreign('relleno_id')->references('id')->on('rellenos')->nullable();

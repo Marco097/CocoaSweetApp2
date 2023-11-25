@@ -8,14 +8,17 @@
                             <div class="col-3">
                                 <h5 class="float-start">Listado de Productos</h5>
                             </div>
+                            <div class="input-group rounded col-md-4 col-sm-12">
+                          <input type="search" v-model="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+                        </div>
                             <div class="col-3">
                                 <button @click="showDialog" class="btn btn-success btn-sm float-end">Nuevo</button>
                             </div>
-                        </div>
-                    </div>
+                            <button type="button" class="btn btn-secondary" @click="alternarMostrarProductos">
+      {{ mostrarInactivos ? 'Mostrar Activos' : 'Mostrar Inactivos' }}
+    </button>
 
-                    <div class="card-body">
-                        <table class="table bordered">
+                            <table class="table bordered">
                             <thead>
                                 <tr>
                                     <th scope="col">Nombre</th>
@@ -31,11 +34,13 @@
                                     <th scope="col">Acciones</th>
                                 </tr>
                             </thead>
-                          <tbody>
-                                <tr v-for="item in productos" :key="item.id">
-                                    <td>{{ item.nombre }}</td>
+                <tbody>
+                    <tr v-for="item in productosMostrados.filter(item => item.nombre.toLowerCase().includes(search.toLowerCase()))" :key="item.id">
+                        <!-- Celdas de la tabla para productos activos -->
+                        <td>{{ item.nombre }}</td>
                                     <td>{{ item.descripcion }}</td>
                                     <td>
+                                        {{ item.sabores }}
                                         <span v-for="sabor in item.sabores">{{ sabor.nombre }}</span>
                                     </td>
                                     <td>{{ item.relleno && item.relleno.nombre ? item.relleno.nombre : '-' }}</td>
@@ -49,18 +54,20 @@
                                         <button type="button" class="btn btn-primary btn-sm"
                                             @click="showDialogEditar(item)"
                                             >Editar</button>
-                                        &nbsp;
-                                        <button type="button" class="btn btn-danger btn-sm"
-                                            @click="eliminar(item)">Eliminar</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                            &nbsp;
+                                            <button  type="button" class="btn btn-danger btn-sm" v-if="!mostrarInactivos" @click="desactivarProducto(item.id)">Desactivar</button>
+                                    &nbsp;
+                                    <button type="button" class="btn btn-danger btn-sm" v-else @click="activarProducto(item.id)">Activar</button>
+                                 </td>
+                            </tr>
+                         </tbody>
+                       </table>
                     </div>
-                </div>
+               </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal -->
     <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
@@ -169,6 +176,7 @@
   </template>
 
   <script>
+   import Swal from 'sweetalert2';
   export default {
     data() {
         return {
@@ -199,10 +207,14 @@
                 catalogo:false,
             },
             filters:[],
-            search:"",
+            search:'',
             sabores:[],
             rellenos:[],
             catalogos:[],
+      productosActivos: [],
+      productosInactivos: [],
+      productosMostrados: [],
+      mostrarInactivos: false
         }
     },  
     computed:{
@@ -211,18 +223,20 @@
           },
           btnTitle(){
           return this.producto.id == null ? "Guardar" : "Actualizar";
-          }
+          },
         },
     methods: {
-        async fetchProductos() {
-            let me = this;
-            await this.axios.get('/productos')
-                .then(response => {
-                    me.productos = response.data;
-                    //console.log('Productos:', me.productos);
-                })
-               // me.fetchSabores();
-        },
+        async fetchProductos(){
+                  let me = this;
+                  await this.axios.get('/productos')
+                  .then(response =>{
+                     me.productos = response.data;
+                     me.productosMostrados = me.mostrarInactivos ? me.productosInactivos : me.productosActivos;
+                     console.log('Productos:', me.productos);
+                  })
+                  
+              },
+
         async fetchSabores(){
                   let me = this;
                   await this.axios.get('/sabores')
@@ -246,6 +260,76 @@
                      me.catalogos = response.data;
                   })
               },
+       async desactivarProducto(id) {
+      try {
+        const response = await this.axios.put(`/productos/${id}/desactivar`);
+        // Manejar la respuesta según tus necesidades
+        console.log(response.data.message);
+        // Puedes actualizar la lista de productos después de desactivar
+        this.fetchProductos();
+      } catch (error) {
+        console.error('Error al desactivar el producto:', error);
+        // Manejar errores, mostrar mensajes, etc.
+      }
+      this.mostrarSweetAlert('Producto desactivado exitosamente');
+    },
+    async activarProducto(id) {
+      try {
+        const response = await this.axios.put(`/productos/${id}/activar`);
+        // Manejar la respuesta según tus necesidades
+        console.log(response.data.message);
+        // Puedes actualizar la lista de productos después de desactivar
+        this.fetchProductos();
+      } catch (error) {
+        console.error('Error al desactivar el producto:', error);
+        // Manejar errores, mostrar mensajes, etc.
+      }
+      this.mostrarSweetAlert('Producto activado exitosamente');
+    },
+    alternarMostrarProductos() {
+      this.mostrarInactivos = !this.mostrarInactivos;
+      this.productosMostrados = this.mostrarInactivos
+        ? this.productosInactivos
+        : this.productosActivos;
+    },
+    mostrarProductosActivos() {
+      this.mostrarInactivos = false;
+      this.productosMostrados = this.productosActivos;
+    },
+    mostrarProductosInactivos() {
+      this.mostrarInactivos = true;
+      this.productosMostrados = this.productosInactivos;
+    },
+    obtenerProductos() {
+        axios.get('/api/productos') // Ajusta la ruta según tu configuración
+    .then(response => {
+      // Verificar si la respuesta tiene las propiedades necesarias
+      if (response.data && response.data.productos_activos && response.data.productos_inactivos) {
+        // Asignar los arrays a las propiedades correspondientes
+        this.productosActivos = response.data.productos_activos;
+        this.productosInactivos = response.data.productos_inactivos;
+        this.productosMostrados = this.mostrarInactivos ? this.productosInactivos : this.productosActivos;
+
+        // Mostrar productos activos por defecto
+        this.mostrarProductosActivos();
+      } else {
+        console.error('La respuesta no tiene la estructura esperada:', response.data);
+      }
+    })
+    .catch(error => {
+      console.error('Error al obtener productos:', error);
+    });
+    },
+    mostrarSweetAlert(mensaje) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Éxito',
+        text: mensaje,
+      }).then(() => {
+        // Recargar la página después de cerrar la alerta
+        location.reload();
+      });
+    },
         showDialog() {
             this.producto = {
                 id: null,
@@ -275,19 +359,19 @@
             };
             $('#productoModal').modal('show');
         },
-        showDialogEditar(producto) {
-      let me = this;
-    $('#productoModal').modal('show');
-    // Verifica si 'producto' es nulo o no está definido antes de intentar acceder a sus propiedades.
-    if (producto) {
-        me.editedProducto = me.productos.indexOf(producto);
-        me.producto = Object.assign({}, producto);
-        me.imagePreview ="/images/productos"+me.producto.imagen; // Asegúrate de que 'imagen' no sea nulo
+        async showDialogEditar(producto) {
+            $('#productoModal').modal('show');
+  let me = this;
+  await me.fetchProductos(); // Espera a que se carguen los productos
+  console.log('Productos:', me.productos);
 
-        // Verifica si 'producto.sabor' y 'producto.relleno' son nulos o no están definidos antes de intentar acceder a sus propiedades.
-        me.producto.sabor_id = producto.sabor ? producto.sabor.id : null;
-        me.producto.relleno_id = producto.relleno ? producto.relleno.id : null;
-    }
+  me.producto = Object.assign({}, producto);
+  me.imagePreview = "/images/productos/" + me.producto.imagen;// Asegúrate de que 'imagen' no sea nulo
+
+    // Verifica si 'producto.sabor' y 'producto.relleno' son nulos o no están definidos antes de intentar acceder a sus propiedades.
+    me.producto.sabor_id = producto.sabor ? producto.sabor.id : null;
+    me.producto.relleno_id = producto.relleno ? producto.relleno.id : null;
+  // Resto del código...
 },
         hideDialog() {
             let me = this;
@@ -397,29 +481,6 @@
                 }
             }
         },
-        async eliminar(producto) {
-            let me = this;
-            this.$swal.fire({
-                title: 'Seguro de eliminar este registro?',
-                text: "No podrás revertir esta accion",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Si',
-                cancelButtonText: 'No',
-            }).then((result) => {
-                if (result.value) {
-                    me.editedProducto = me.productos.indexOf(producto);
-                    this.axios.delete(`/productos/${producto.id}`)
-                        .then(response => {
-                            me.verificarAccion(null, response.status, "del");
-                        }).catch(errors => {
-                            console.log(errors);
-                        })
-                }
-            })
-        },
         verificarAccion(producto, statusCode, accion) {
             let me = this;
             const Toast = this.$swal.mixin({
@@ -483,7 +544,10 @@
         this.fetchSabores();
         this.fetchRellenos();
         this.fetchCatalogos();
+        this.obtenerProductos();
        // this.fetchCoberturas()
     }
   }
   </script>
+
+  

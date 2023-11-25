@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-sm-4" v-for="(item, index) in productos" :key="index">
           <div class="card">
-            <img :src="`/images/productos/${item.imagen}`" class="card-img-top">
+            <img :src="`/images/productos/${item.producto.imagen}`" alt="Producto" width="50" height="50">
             <div class="card-body">
               <h5 class="card-title text-bold">{{ item.nombre }}</h5>
               <p class="card-text">Precio <b class="text-warning">${{ item.precio }}</b></p>             
@@ -65,7 +65,12 @@ export default {
     me.reservaForm.detallePedido.push({
         id: null,
         cantidad:me.cantidad,
-        producto: item,
+        producto: {
+      id: item.id,
+      nombre: item.nombre,
+      precio: item.precio,
+      imagen: item.imagen, // Asegúrate de incluir la propiedad imagen aquí
+    },
     });
     console.log(me.reservaForm.detallePedido);
 

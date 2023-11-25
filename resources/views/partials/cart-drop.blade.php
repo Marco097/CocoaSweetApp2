@@ -4,7 +4,7 @@
         <li class="list-group-item">
             <div class="row">
                 <div class="col-lg-3">
-                    <img src="/images/productos/{{ $item->attributes->image }}"
+                    <img src="/images/productos/{{ $item->attributes->img }}"
                          style="width: 50px; height: 50px;">
                 </div>
                 <div class="col-lg-6">
@@ -14,9 +14,9 @@
                 <div class="col-lg-3">
                     <p>${{ \Cart::get($item->id)->getPriceSum() }}</p>
                 </div>
-                <hr>
             </div>
         </li>
+        <hr>
     @endforeach
     <br>
     <li class="list-group-item">
@@ -25,9 +25,10 @@
                 <b>Total: </b>${{ \Cart::getTotal() }}
             </div>
             <div class="col-lg-2">
-                <form action="{{ route('cart.remove') }}" method="POST">
+                <form action="{{ route('cart.delete', ['id' => $item->id]) }}" method="POST">
                     {{ csrf_field() }}
-                    <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+                    {{ method_field('DELETE') }}
+                    <button class="btn btn-dark btn-sm"><i class="fa fa-trash"></i></button>
                 </form>
             </div>
         </div>

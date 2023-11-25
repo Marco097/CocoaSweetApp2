@@ -8,16 +8,13 @@
                         <div class="col-7">
                         <h5>Listado de sabores</h5>
                       </div>
+                      <div class="input-group rounded col-md-4 col-sm-12">
+                          <input type="search" v-model="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+                        </div>
                        <div class="col 6">
                         <button @click="showDialog" class="btn btn-success btn-sm float-end">Nuevo</button>
                        </div>
                     </div>
-                    <div class="row">
-                      <div class="input-group rounded">
-                        <input type="search" v-model="search" @input="buscar" class="form-control rounded" placeholder="Buscar" arial-label="Search" aria-describedby="search-addon">
-                      </div>
-                    </div>
-                  
                       </div>
                     <div class="card-body">
                       <table class="table bordered">
@@ -28,7 +25,7 @@
                           </tr>
                         </thead>
                             <tbody>
-                              <tr v-for="item in sabores" :key = "item.id" >
+                              <tr v-for="item in items" :key="item.id">
                                   <td>{{ item.nombre }}</td>
                                 <td>
                                   <button class="btn btn-primary btn-sm" @click="showDialogEditar(item)">Editar</button>
@@ -87,9 +84,6 @@
                   search: ''
               }
           },
-          created: function(){
-            this.filters = this.sabores;
-          },
           computed:{
         formTitle(){
             return this.sabor.id == null ? "Agregar sabor" : "Actualizar sabor";
@@ -97,12 +91,11 @@
           btnTitle(){
           return this.sabor.id == null ? "Guardar" : "Actualizar";
           },
-        items()
-          {
-            return this.sabores.filter(item =>{
-              return item.nombre.toLowerCase().includes(this.seach.toLocaleLowerCase());
-            } )
-          }
+          items(){
+                return this.sabores.filter(item =>{
+                    return item.nombre.toLowerCase().includes(this.search.toLowerCase());
+                })
+            }
         },
           methods:{
                //para que no haga una peticion directa 

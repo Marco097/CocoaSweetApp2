@@ -9,37 +9,38 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 //use App\Http\Controllers\CoberturaController;
 use App\Models\Cobertura;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        try {
-            // Obtener todos los productos con sus relaciones
-            $productos = Producto::with(['producto_sabores', 'relleno', 'catalogo', 'producto_coberturas'])->get();
-            
-            // Iterar sobre los productos y cargar los sabores en un array
-            $response = $productos->map(function ($producto) {
-                $productoArray = $producto->toArray();
-                
-                // Obtener los sabores y agregarlos al array del producto
-                $sabores = $producto->producto_sabores->map(function ($productoSabor) {
-                    return $productoSabor->sabor->toArray();
-                });
-                
-                $productoArray["sabores"] = $sabores->toArray();
-                
-                return $productoArray;
-            });
-            
-            return $response;
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'fail', 'data' => null], 500);
-        }
+        $search = $request->get('search');
+    
+        // Consulta para obtener productos activos
+        $productosActivos = Producto::where('estado', 'activo')
+            ->where('nombre', 'like', "%$search%")
+            ->with(['producto_sabores', 'relleno', 'catalogo', 'producto_coberturas'])
+            ->get();
+        
+        // Consulta para obtener productos inactivos
+        $productosInactivos = Producto::where('estado', 'inactivo')
+            ->where('nombre', 'like', "%$search%")
+            ->with(['producto_sabores', 'relleno', 'catalogo', 'producto_coberturas'])
+            ->get();
+    
+        // Combina los resultados de ambas consultas
+        $response = [
+            'productos_activos' => $productosActivos,
+            'productos_inactivos' => $productosInactivos,
+        ];
+    
+        return $response;
+        
     }
 
     /**
@@ -158,7 +159,7 @@ class ProductoController extends Controller
             $response = $producto->toArray();
             $response["relleno"]= $producto->relleno->toArray();
             $response["catalogo"]= $producto->catalogo->toArray();
-            $response["sabor"] = $producto->sabor->toArray();
+            $response["sabor"] = $producto->producto_sabores->pluck('sabor')->toArray(); // Modificado para obtener los sabores
            // $response["promocion"] = $producto->promocion->toArray();  
             $response["cobertura"] = $producto->cobertura->toArray(); 
           // Calcula el costo total, incluyendo las coberturas adicionales
@@ -292,13 +293,46 @@ class ProductoController extends Controller
         }        
 }
 
+public function desactivarProducto($id)
+{
+    try {
+        $producto = Producto::findOrFail($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function inactivos(Request $request)
-    {
-    
-       
+        // Verifica si el producto ya está inactivo antes de intentar desactivarlo nuevamente
+        if ($producto->estado === 'inactivo') {
+            return response()->json(['message' => 'El producto ya está inactivo'], 200);
+        }
+
+        $producto->estado = 'inactivo';
+        $producto->save();
+
+        return response()->json(['message' => 'Producto desactivado con éxito']);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['message' => 'Producto no encontrado'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error al desactivar el producto', 'error' => $e->getMessage()], 500);
     }
+}
+
+public function activarProducto($id)
+{
+    try {
+        $producto = Producto::findOrFail($id);
+
+        // Verifica si el producto ya está inactivo antes de intentar desactivarlo nuevamente
+        if ($producto->estado === 'activo') {
+            return response()->json(['message' => 'El producto ya está activo'], 200);
+        }
+
+        $producto->estado = 'activo';
+        $producto->save();
+
+        return response()->json(['message' => 'Producto activo con éxito']);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json(['message' => 'Producto no encontrado'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error al activar el producto', 'error' => $e->getMessage()], 500);
+    }
+}
+
 }

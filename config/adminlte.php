@@ -360,14 +360,6 @@ return [
                         'icon' => 'fas fw fa-truck',
                    
                 ],
-                [
-                    'text' => 'Coberturas',
-                    'url'  => '#',
-                ],
-                [
-                    'text' => 'Rellenos',
-                    'url'  => '#',
-                ],
             ],
         ],
         [

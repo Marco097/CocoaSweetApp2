@@ -3,7 +3,7 @@
     <div class="container" style="margin-top: 80px">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Tienda</a></li>
+                <li class="breadcrumb-item"><a href="/shop">Tienda</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Cart</li>
             </ol>
         </nav>
@@ -45,7 +45,7 @@
                 @foreach($cartCollection as $item)
     <div class="row">
         <div class="col-lg-3">
-            <img src="/images/productos/{{ $item->attributes->img }}" class="img-thumbnail" width="200" height="200">
+            <img src="{{ asset('images/productos/' . $item->attributes->img) }}" class="img-thumbnail" width="200" height="200">
         </div>
         <div class="col-lg-5">
             <p>
@@ -67,41 +67,32 @@
         </div>
         <div class="col-lg-4">
             <div class="row">
-                <form action="{{ route('cart.update') }}" method="POST">
+                <form action="{{ route('cart.update') }}" method="POST" >
                     {{ csrf_field() }}
                     <input type="hidden" value="{{ $item->id }}" id="id" name="id">
                     <label for="quantity">Cantidad:</label>
                     <input type="number" name="quantity" id="quantity" value="{{ $item->quantity }}">
-                            
+            
                     @if ($item->producto && $item->producto->catalogo->nombre == 'Paletas')
-    {{--  <label for="cobertura">Cobertura:</label>
-    <select name="cobertura" id="cobertura">
-        @foreach($coberturas as $cobertura)
-            <option value="{{ $cobertura->id }}" {{ $item->attributes->cobertura == $cobertura->id ? 'selected' : '' }}>{{ $cobertura->nombre }}</option>
-        @endforeach
-    </select>--}}
-@endif
 
-                    
+                    @endif
                     <button type="submit" class="btn btn-primary"  style="margin-right: 10px;">Actualizar</button>
-                    <form action="{{ route('cart.remove') }}" method="POST">
-                        {{ csrf_field() }}
-                        <input type="hidden" value="{{ $item->id }}" id="id" name="id">
-                        <button class="btn btn-dark btn-sm" style="margin-right: 10px;"><i class="fa fa-trash"></i></button>
-                    </form>
                 </form>
-                <!-- Aquí va código para eliminar el producto del carrito -->
-                
-            </div>
+                <form action="{{ route('cart.delete', ['id' => $item->id]) }}" method="POST">
+                    {{ csrf_field() }}
+                    {{ method_field('DELETE') }}
+                    <button class="btn btn-dark btn-sm"><i class="fa fa-trash"></i></button>
+                </form>
         </div>
     </div>
+ </div>
     <hr>
-@endforeach
-<div class="card">
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item"><b>Total del Carrito: ${{ Cart::getTotal() }}</b></li>
-    </ul>
-</div>
+       @endforeach
+       <div class="card">
+         <ul class="list-group list-group-flush">
+         <li class="list-group-item"><b>Total del Carrito: ${{ Cart::getTotal() }}</b></li>
+        </ul>
+    </div>
                                 
 
                 @if(count($cartCollection)>0)
@@ -120,10 +111,10 @@
                         </ul>
                     </div>
                     <br><a href="/shop" class="btn btn-dark">Continue en la tienda</a>
-                    <a href="/checkout" class="btn btn-success">Realizar Pedido</a>
+                    <a href="/checkout" class="btn btn-success">Forma de Pago</a>
                               <!-- Button trigger modal -->
         
-                              <form action="{{ route('pedido.finalizar') }}" method="POST">
+                              <form action="{{ route('pedido.finalizar') }}" method="POST" id="pedidoForm">
                                 @csrf
                                 <div class="form-group">
                                     <label for="direccion_envio">Dirección de envío:</label>
@@ -137,16 +128,37 @@
                                     <label for="fecha_entrega">Fecha de entrega:</label>
                                     <input type="date" id="fecha_entrega" name="fecha_entrega" class="form-control">
                                 </div>
-                                <button type="submit" class="btn btn-success">Realizar Pedido</button>
+                                <div class="form-group">
+                                    <label for="fecha_entrega">Hora de entrega:</label>
+                                    <input type="time" id="hora" name="hora" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-success" >Realizar Pedido</button>
                             </form>
-                            
-       
+
+                            <!-- Agrega SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("pedidoForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Evitar el envío del formulario
+            Swal.fire({
+                title: '¿Confirmar pedido?',
+                text: 'Una vez confirmado, no podrás modificar tu pedido.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, confirmar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, enviar el formulario
+                    document.getElementById("pedidoForm").submit();
+                }
+            });
+        });
+    });
+</script>
                 </div>
-            @endif
-
-  
-
-        <br><br>
-
-        
+            @endif        
 @endsection
