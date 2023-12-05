@@ -194,104 +194,107 @@ class ProductoController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
-{
-    try {
-        $errores = 0;
-        DB::beginTransaction();
-        $producto = Producto::findOrFail($id);
-
-        $imagenAnterior = $producto->imagen;
-        $producto->nombre = $request->nombre;
-        $producto->descripcion = $request->descripcion;
-        $producto->precio = $request->precio;
-        $producto->existencias = $request->existencias;
-        $producto->hecho = $request->hecho;
-        $producto->vencimiento = $request->vencimiento;
-        $producto->imagen = $request->imagen;
-        $producto->relleno_id = $request->relleno_id;
-        $producto->catalogo_id = $request->catalogo_id;
-
-        // COMPROBANDO SI VIENE UNA IMAGEN
-        if ($request->hasFile('imagen')) {
-            // eliminando el archivo anterior
-            $imagePath = public_path() . '/images/productos/' . $imagenAnterior;
-            if ($imagenAnterior != 'none.jpg') {
-                unlink($imagePath);
+    {
+        try {
+            $errores = 0;
+            DB::beginTransaction();
+            $producto = Producto::findOrFail($id);
+    
+            $imagenAnterior = $producto->imagen;
+            $producto->nombre = $request->nombre;
+            $producto->descripcion = $request->descripcion;
+            $producto->precio = $request->precio;
+            $producto->existencias = $request->existencias;
+            $producto->hecho = $request->hecho;
+            $producto->vencimiento = $request->vencimiento;
+            $producto->imagen = $request->imagen;
+            $producto->relleno_id = $request->relleno_id;
+            $producto->catalogo_id = $request->catalogo_id;
+    
+            // COMPROBANDO SI VIENE UNA IMAGEN
+            if ($request->hasFile('imagen')) {
+                // eliminando el archivo anterior
+                $imagePath = public_path() . '/images/productos/' . $imagenAnterior;
+                if ($imagenAnterior != 'none.jpg') {
+                    unlink($imagePath);
+                }
+                // obteniendo el archivo de imagen
+                $imagen = $request->file('imagen');
+                // generando un nombre único para la imagen
+                $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
+                // subiendo la imagen a una carpeta del servidor
+                $imagen->move(public_path('images/productos/'),$nombreImagen);
+                $producto->imagen = $nombreImagen;
             }
-            // obteniendo el archivo de imagen
-            $imagen = $request->file('imagen');
-            // generando un nombre único para la imagen
-            $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
-            // subiendo la imagen a una carpeta del servidor
-            $imagen->move(public_path('images/productos/'),$nombreImagen);
-            $producto->imagen = $nombreImagen;
-        }
-        
-        if($producto->update() <= 0)
+            
+            if($producto->update() <= 0)
+                {
+                    $errores++;
+                }
+    
+            // Guardar las relaciones con sabores
+            $sabores = $request->productoSabor;
+            if (!is_null($sabores) && is_array($sabores)) {
+                foreach ($sabores as $key => $sabor) {
+                    $productoSabor = ProductoSabor::findOrFail($sabor['id']);
+                    $productoSabor->sabor_id = $sabor['id'];
+                    $productoSabor->producto_id = $producto->id;
+    
+                    if ($productoSabor->update() <= 0) {
+                        $errores++;
+                    }
+                }
+            }
+    
+            // Guardando la relación de promociones
+            $promociones = $request->productoPromocion;
+            if (!is_null($promociones) && is_array($promociones)) {
+                foreach ($promociones as $key => $promocion) {
+                    $productoPromocion = ProductoPromocion::findOrFail($promocion['id']);
+                    $productoPromocion->promocion_id = $promocion['id'];
+                    $productoPromocion->producto_id = $producto->id;
+    
+                    if ($productoPromocion->update() <= 0) {
+                        $errores++;
+                    }
+                }
+            }
+    
+            // GUARDANDO LA COBERTURA
+            $coberturas = $request->productoCobertura;
+            if (!is_null($coberturas) && is_array($coberturas)) {
+                foreach ($coberturas as $key => $cobertura) {
+                    $productoCobertura = ProductoCobertura::findOrFail($cobertura['id']);
+                    $productoCobertura->cobertura_id = $cobertura['id'];
+                    $productoCobertura->producto_id = $producto->id;
+    
+                    if ($productoCobertura->update() <= 0) {
+                        $errores++;
+                    }
+                }
+            }
+    
+            if($errores == 0)
             {
-                $errores++;
+                DB::commit();
+                return response()->json(['status'=>'ok','data'=>$producto],202);
+            }else{
+                DB::rollBack();
+                return response()->json(['status'=>'fail','data'=>null],409);
             }
+        }catch(\Exception $e)
+            {
+                //DB::rollBack();
+            return $e->getMessage();
+            }        
+    }
+    
 
-        // Guardar las relaciones con sabores
-        $sabores = $request->productoSabor;
-        if (!is_null($sabores) && is_array($sabores)) {
-            foreach ($sabores as $key => $sabor) {
-                $productoSabor = ProductoSabor::findOrFail($sabor['id']);
-                $productoSabor->sabor_id = $sabor['id'];
-                $productoSabor->producto_id = $producto->id;
-
-                if ($productoSabor->update() <= 0) {
-                    $errores++;
-                }
-            }
-        }
-
-        // Guardando la relación de promociones
-        $promociones = $request->productoPromocion;
-        if (!is_null($promociones) && is_array($promociones)) {
-            foreach ($promociones as $key => $promocion) {
-                $productoPromocion = ProductoPromocion::findOrFail($promocion['id']);
-                $productoPromocion->promocion_id = $promocion['id'];
-                $productoPromocion->producto_id = $producto->id;
-
-                if ($productoPromocion->update() <= 0) {
-                    $errores++;
-                }
-            }
-        }
-
-        // GUARDANDO LA COBERTURA
-        $coberturas = $request->productoCobertura;
-        if (!is_null($coberturas) && is_array($coberturas)) {
-            foreach ($coberturas as $key => $cobertura) {
-                $productoCobertura = ProductoCobertura::findOrFail($cobertura['id']);
-                $productoCobertura->cobertura_id = $cobertura['id'];
-                $productoCobertura->producto_id = $producto->id;
-
-                if ($productoCobertura->update() <= 0) {
-                    $errores++;
-                }
-            }
-        }
-
-        if($errores == 0)
-        {
-            DB::commit();
-            return response()->json(['status'=>'ok','data'=>$producto],202);
-        }else{
-            DB::rollBack();
-            return response()->json(['status'=>'fail','data'=>null],409);
-        }
-    }catch(\Exception $e)
-        {
-            //DB::rollBack();
-        return $e->getMessage();
-        }        
-}
+    /**
+     * Update an active product.
+     */
+    
 
 public function desactivarProducto($id)
 {

@@ -49,7 +49,7 @@ Route::get('/productos/inactivos', [ProductoController::class, 'getProductosInac
 Route::get('/productos',[ProductoController::class, 'index'])->name('productos.index');
 //Route::get('/productos/search', [ProductoController::class, 'buscarProductos'])->name('productos.search');
 
- Route::post('/productos/{producto}', [ProductoController::class, 'update']);
+Route::post('/productos/{producto}', [ProductoController::class, 'update']);
  Route::put('/productos/{id}/desactivar', [ProductoController::class,'desactivarProducto']);
  Route::put('/productos/{id}/activar', [ProductoController::class,'activarProducto']);
  Route::get('/search', [CartController::class, 'searchProducts'])->name('search.products');

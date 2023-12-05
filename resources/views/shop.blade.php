@@ -9,7 +9,8 @@
         </nav>
         <div class="row justify-content-center">
             <div class="col-lg-12">
-                <h4 class="text-center" style="color: #FFB6C1;">Productos</h4>
+                <h1 class="text-center" style="color: #FFB6C1;">Productos</h1>
+                <h5 class="text-center" style="color: #000000;">Por la cantidad de 10 productos tendra que agendar el pedido con 5 dias de antisipacion.</h5>
                 <hr> 
                 <form action="{{ route('search.products') }}" method="GET" class="mb-4">
                     <div class="input-group">

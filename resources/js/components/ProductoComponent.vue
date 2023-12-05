@@ -51,9 +51,7 @@
                                     <td>{{ item.vencimiento }}</td>
                                     <td><img :src="`/images/productos/${item.imagen}`" :alt="`${item.imagen}`" style="width:100px;height: 100px"></td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-sm"
-                                            @click="showDialogEditar(item)"
-                                            >Editar</button>
+                                        <button type="button" class="btn btn-primary btn-sm" @click="editarProducto(item)">Editar</button>
                                             &nbsp;
                                             <button  type="button" class="btn btn-danger btn-sm" v-if="!mostrarInactivos" @click="desactivarProducto(item.id)">Desactivar</button>
                                     &nbsp;
@@ -226,17 +224,23 @@
           },
         },
     methods: {
-        async fetchProductos(){
-                  let me = this;
-                  await this.axios.get('/productos')
-                  .then(response =>{
-                     me.productos = response.data;
-                     me.productosMostrados = me.mostrarInactivos ? me.productosInactivos : me.productosActivos;
-                     console.log('Productos:', me.productos);
-                  })
-                  
-              },
-
+        async fetchProductos() {
+        let me = this;
+        try {
+            const response = await this.axios.get('/productos');
+            // Verificar si la respuesta tiene las propiedades esperadas
+            if (response.data.productos_activos && response.data.productos_inactivos) {
+                // Asignar las propiedades a las variables correspondientes
+                me.productosActivos = response.data.productos_activos;
+                me.productosInactivos = response.data.productos_inactivos;
+                me.productosMostrados = me.mostrarInactivos ? me.productosInactivos : me.productosActivos;
+            } else {
+                console.error('La respuesta de /productos no tiene las propiedades esperadas:', response.data);
+            }
+        } catch (error) {
+            console.error('Error al obtener productos:', error);
+        }
+    },
         async fetchSabores(){
                   let me = this;
                   await this.axios.get('/sabores')
@@ -260,6 +264,7 @@
                      me.catalogos = response.data;
                   })
               },
+              
        async desactivarProducto(id) {
       try {
         const response = await this.axios.put(`/productos/${id}/desactivar`);
@@ -330,6 +335,9 @@
         location.reload();
       });
     },
+    editarProducto(producto) {
+      this.showDialogEditar(producto);
+    },
         showDialog() {
             this.producto = {
                 id: null,
@@ -359,20 +367,26 @@
             };
             $('#productoModal').modal('show');
         },
-        async showDialogEditar(producto) {
-            $('#productoModal').modal('show');
-  let me = this;
-  await me.fetchProductos(); // Espera a que se carguen los productos
-  console.log('Productos:', me.productos);
-
-  me.producto = Object.assign({}, producto);
-  me.imagePreview = "/images/productos/" + me.producto.imagen;// Asegúrate de que 'imagen' no sea nulo
-
-    // Verifica si 'producto.sabor' y 'producto.relleno' son nulos o no están definidos antes de intentar acceder a sus propiedades.
-    me.producto.sabor_id = producto.sabor ? producto.sabor.id : null;
-    me.producto.relleno_id = producto.relleno ? producto.relleno.id : null;
-  // Resto del código...
-},
+        showDialogEditar(producto) {
+      $('#productoModal').modal('show');
+      if (producto) {
+        this.editedProducto = this.productos.indexOf(producto);
+        this.producto = {
+          id: producto.id,
+          nombre: producto.nombre,
+          descripcion: producto.descripcion,
+          sabor_id: producto.sabor ? producto.sabor.id : null,
+          relleno_id: producto.relleno ? producto.relleno.id : null,
+          catalogo_id: producto.catalogo ? producto.catalogo.id : null,
+          precio: producto.precio,
+          existencias: producto.existencias,
+          hecho: producto.hecho,
+          vencimiento: producto.vencimiento,
+          imagen: producto.imagen,
+        };
+        this.imagePreview = `/images/productos/${this.producto.imagen}`;
+      }
+    },
         hideDialog() {
             let me = this;
             setTimeout(() => {
@@ -491,22 +505,17 @@
                 tinerProgressBar: true
             });
             switch (accion) {
-                case "add":
-                    //agregamos al principio del arreglo producto, la nueva producto
-                    //me.auto.unshift(auto);
-                    me.fetchProductos();
-                    Toast.fire({
-                        icon: 'success',
-                        'title': 'Producto registrada con exito...!'
-                    });
-                    break;
-                case "upd":
-                    Object.assign(me.productos[me.editedProducto], producto);
-                    Toast.fire({
-                        icon: 'success',
-                        'title': 'Producto actualizada con exito...!'
-                    });
-                    break;
+        case "add":
+        case "upd":
+            // Actualizar la lista de productos
+            me.fetchProductos();
+            // Mostrar el modal después de agregar o actualizar
+            me.showDialog();
+            Toast.fire({
+                icon: 'success',
+                title: `Producto ${accion === 'add' ? 'agregado' : 'actualizado'} con éxito...!`
+            });
+            break;
                 case "del":
                     if (statusCode == 205) {
                         me.productos.splice(this.editedProducto, 1);
@@ -523,6 +532,7 @@
                     break;
             }
         },
+
 
   getImage(event){
       let file = event.target.files[0];
